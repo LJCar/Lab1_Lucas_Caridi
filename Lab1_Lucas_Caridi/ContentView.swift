@@ -17,6 +17,23 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
+            if isQuizActive{
+                Text("\(number)")
+                    .font(.largeTitle).fontWeight(.heavy)
+                    .padding()
+                HStack{
+                    Button(action: {checkAnswer(answer: true)}, label: {
+                        Text("PRIME").fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                    })
+                    .padding().background(.blue).foregroundColor(.black).cornerRadius(5)
+                    Button(action: {checkAnswer(answer: false)}, label: {
+                        Text("NOT PRIME").fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                    })
+                    .padding().background(.black).foregroundColor(.red).cornerRadius(5)
+                }
+                
+                Text(result).font(.headline).padding()
+            }
             VStack{
                 Button(action: {toggleQuiz()}, label: {
                     Text(isQuizActive ? "Stop Prime Quiz" : "Start Prime Quiz")
@@ -24,7 +41,7 @@ struct ContentView: View {
                 .font(.largeTitle)
                 .padding()
                 .background(isQuizActive ? Color.red : Color.green)
-                .foregroundColor(.white)
+                .foregroundColor(isQuizActive ? Color.black : Color.white)
                 .cornerRadius(5)
                 .padding()
             }
@@ -38,6 +55,28 @@ struct ContentView: View {
             result = ""
             correct = 0
             wrong = 0
+        }
+    }
+    
+    func isPrime(_ num: Int) -> Bool {
+        for i in 2..<num {
+            if num % i == 0 {
+                return false
+            }
+        }
+        return true
+        
+    }
+    
+    func checkAnswer(answer: Bool) {
+        let isCorrect = answer == isPrime(number)
+        if isCorrect {
+            result = "\u{2705}"
+            correct += 1
+        }
+        else {
+            result = "\u{274C}"
+            wrong += 1
         }
     }
 }
