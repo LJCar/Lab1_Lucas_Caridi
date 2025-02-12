@@ -13,6 +13,8 @@ struct ContentView: View {
     @State private var result: String = ""
     @State private var correct = 0
     @State private var wrong = 0
+    @State private var timer: Timer?
+    @State private var showDialog = false
 
     
     var body: some View {
@@ -46,6 +48,16 @@ struct ContentView: View {
                 .padding()
             }
         }
+        .alert("Quiz Completed!", isPresented: $showDialog) {
+            Button("OK") {
+                correct = 0
+                wrong = 0
+                isQuizActive = false
+            }
+        } message: {
+            Text("\u{2705} Correct: \(correct)")
+            Text("\u{274C} Wrong: \(wrong)")
+        }
     }
     
     func toggleQuiz() {
@@ -55,6 +67,10 @@ struct ContentView: View {
             result = ""
             correct = 0
             wrong = 0
+            quizTimer()
+        }
+        else {
+            timer?.invalidate()
         }
     }
     
@@ -77,6 +93,32 @@ struct ContentView: View {
         else {
             result = "\u{274C}"
             wrong += 1
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            updateGame()
+        }
+    }
+    
+    func updateGame() {
+        if correct + wrong == 10 {
+            showDialog = true
+        }
+        else {
+            number = Int.random(in: 1...100)
+            result = ""
+            quizTimer()
+        }
+    }
+    
+    func quizTimer(){
+        timer?.invalidate()
+        if isQuizActive {
+            timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { _ in wrong += 1
+                result = "\u{274C} OUT OF TIME!"
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    updateGame()
+                }
+            }
         }
     }
 }
